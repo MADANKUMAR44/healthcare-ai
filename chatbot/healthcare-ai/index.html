@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMART RURAL HEALTHCARE CHATBOT AI</title>
+    <!-- Use Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="light-mode">
+    <div class="app-container">
+        <!-- Sidebar with Tools -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fa-solid fa-heart-pulse"></i> Healthcare AI</h2>
+            </div>
+            <div class="sidebar-tools">
+                <button class="tool-btn" onclick="openModal('bmiModal')"><i class="fa-solid fa-weight-scale"></i> BMI
+                    Calculator</button>
+                <button class="tool-btn" onclick="openModal('ageModal')"><i class="fa-solid fa-calendar-days"></i> Age
+                    Calculator</button>
+                <button class="tool-btn" onclick="openModal('hospitalModal')"><i class="fa-solid fa-hospital"></i>
+                    Nearby Hospitals</button>
+                <button class="tool-btn" onclick="openHistoryModal()"><i class="fa-solid fa-clock-rotate-left"></i> View
+                    History</button>
+                <a href="tel:108" class="tool-btn call-108"><i class="fa-solid fa-phone"></i> Call 108 Direct</a>
+            </div>
+            <div class="sidebar-settings">
+                <div class="form-group" style="padding: 0 10px;">
+                    <label style="font-size: 0.9rem;"><i class="fa-solid fa-key"></i> Groq API Key:</label>
+                    <input type="password" id="groqApiKey" placeholder="Enter API Key to chat..."
+                        style="font-size: 0.8rem; padding: 8px;">
+                </div>
+                <div class="form-group" style="padding: 0 10px; margin-top: 5px;">
+                    <label style="font-size: 0.9rem;"><i class="fa-solid fa-phone"></i> Emergency SMS Contact:</label>
+                    <input type="text" id="emergencyContact" placeholder="e.g. 108 or family number" value="108"
+                        style="font-size: 0.8rem; padding: 8px;">
+                </div>
+                <button class="tool-btn language-toggle" id="langToggleBtn" onclick="toggleLanguage()">
+                    <i class="fa-solid fa-language"></i> Lang: English
+                </button>
+                <button class="tool-btn dark-mode-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+                    <i class="fa-solid fa-moon"></i> Dark Mode
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-container">
+            <header class="chat-header">
+                <div class="bot-info">
+                    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712038.png" alt="Bot Avatar"
+                        class="bot-avatar">
+                    <div class="bot-status">
+                        <h3>SMART RURAL HEALTHCARE CHATBOT AI</h3>
+                        <span class="online-indicator"><i class="fa-solid fa-circle"></i> Online</span>
+                    </div>
+                </div>
+                <button class="emergency-btn" onclick="triggerEmergency()"><i
+                        class="fa-solid fa-triangle-exclamation"></i> Emergency Alert</button>
+            </header>
+
+            <div class="chat-box" id="chatBox">
+                <!-- Chat messages will be injected here -->
+                <div class="message bot-message">
+                    <div class="msg-content">Hello! I am your Smart Rural Healthcare Assistant. How can I help you
+                        today? Do you need medical advice, first aid info or want to check symptoms?</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <span></span><span></span><span></span>
+            </div>
+
+            <footer class="chat-input-area">
+                <button class="icon-btn location-btn" id="locationBtn" title="Share Location" onclick="shareLocation()">
+                    <i class="fa-solid fa-location-dot"></i>
+                </button>
+                <button class="icon-btn voice-btn" id="voiceBtn" title="Voice Input">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <input type="text" id="userInput" placeholder="Type your message here..."
+                    onkeypress="handleEnter(event)">
+                <button class="icon-btn send-btn" id="sendBtn" onclick="sendMessage()">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- BMI Modal -->
+    <div id="bmiModal" class="modal">
+        <div class="modal-content glass-modal">
+            <span class="close-modal" onclick="closeModal('bmiModal')">&times;</span>
+            <h2>BMI Calculator</h2>
+            <div class="form-group">
+                <label>Weight (kg):</label>
+                <input type="number" id="bmiWeight" placeholder="e.g. 70">
+            </div>
+            <div class="form-group">
+                <label>Height (cm):</label>
+                <input type="number" id="bmiHeight" placeholder="e.g. 175">
+            </div>
+            <button class="primary-btn" onclick="calculateBMI()">Calculate</button>
+            <div id="bmiResult" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Age Modal -->
+    <div id="ageModal" class="modal">
+        <div class="modal-content glass-modal">
+            <span class="close-modal" onclick="closeModal('ageModal')">&times;</span>
+            <h2>Age Calculator</h2>
+            <div class="form-group">
+                <label>Date of Birth:</label>
+                <input type="date" id="dobInput">
+            </div>
+            <button class="primary-btn" onclick="calculateAge()">Calculate</button>
+            <div id="ageResult" class="result-box"></div>
+        </div>
+    </div>
+
+    <!-- Hospital Modal -->
+    <div id="hospitalModal" class="modal">
+        <div class="modal-content glass-modal">
+            <span class="close-modal" onclick="closeModal('hospitalModal')">&times;</span>
+            <h2>Nearby Services</h2>
+            <div class="form-group">
+                <label>Select Category:</label>
+                <select id="hospitalType">
+                    <option value="Hospital">Hospital</option>
+                    <option value="Emergency Room">Emergency</option>
+                    <option value="Pharmacy">Pharmacy</option>
+                    <option value="Clinic">Clinic</option>
+                </select>
+            </div>
+            <button class="primary-btn" onclick="findHospitals()">Find Near Me</button>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content glass-modal" style="max-width: 600px;">
+            <span class="close-modal" onclick="closeModal('historyModal')">&times;</span>
+            <h2>Activity History</h2>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button class="primary-btn" onclick="showChatHistoryLog()">Chat History</button>
+                <button class="primary-btn" onclick="showEmergencyHistoryLog()"
+                    style="background: var(--danger-color);">Emergency Logs</button>
+            </div>
+
+            <div id="historyContent"
+                style="max-height: 400px; overflow-y: auto; text-align: left; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 10px;">
+                Select a category to view history.
+            </div>
+
+            <button class="primary-btn" onclick="clearHistory()" style="margin-top: 15px; background: #6c757d;">Clear
+                All History</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
